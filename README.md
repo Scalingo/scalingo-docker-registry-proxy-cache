@@ -1,6 +1,6 @@
 # Build with bake
 ```bash
-TAG="docker-registry-proxy-cache" docker buildx bake --file docker-bake.hcl
+docker buildx bake --file docker-bake.hcl
 ```
 
 # Create .env file
@@ -11,7 +11,7 @@ vim .env
 
 # Run with docker
 ```bash
-TAG="docker-registry-proxy-cache" docker run --name openresty_docker_registry_proxy \
+docker run --name openresty_docker_registry_proxy \
   --rm -it \
   -p 3128:3128 \
   -v $(pwd)/docker_mirror_cache:/docker_mirror_cache \
@@ -22,7 +22,7 @@ TAG="docker-registry-proxy-cache" docker run --name openresty_docker_registry_pr
 
 # Run with docker compose
 ```bash
-TAG="docker-registry-proxy-cache" docker compose up
+docker compose up
 ```
 
 The `HTPASSWD` environment variable activates basic authentication. In this example, we define two users:
