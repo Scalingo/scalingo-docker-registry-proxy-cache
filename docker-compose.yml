@@ -1,6 +1,6 @@
 services:
   docker-proxy-cache:
-    image: ${TAG}
+    image: ${TAG:-docker-registry-proxy-cache:latest}
     ports:
       - 3128
     volumes:
