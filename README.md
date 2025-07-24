@@ -1,27 +1,28 @@
-# Build openresty with proxy-connect module
+# Build with bake
 ```bash
-docker build -f Dockerfile.openresty -t openresty-proxy-connect:1.0.0 .
+TAG="docker-registry-proxy-cache" docker buildx bake --file docker-bake.hcl
 ```
 
-# Build docker registry proxy based on openresty with htpasswd
+# Create .env file
 ```bash
-docker build -f Dockerfile -t openresty-docker-registry-proxy:1.0.0 .
+cp .env.sample .env
+vim .env
 ```
 
-# Run docker registry proxy sample
+# Run with docker
 ```bash
-docker run --name openresty_docker_registry_proxy --rm -it \
+TAG="docker-registry-proxy-cache" docker run --name openresty_docker_registry_proxy \
+  --rm -it \
   -p 3128:3128 \
   -v $(pwd)/docker_mirror_cache:/docker_mirror_cache \
   -v $(pwd)/certs:/certs \
-  -e REGISTRIES="own-registry.sample.com" \
-  -e VERIFY_SSL="false" \
-  -e HTPASSWD='user1:$apr1$OvGg62Jt$Tg2r7b0nu9LHYtthKBGva/ user2:$apr1$FMKFApNl$47e0wnD8ajeh.B2u64lLI.' \
-  -e AUTH_REGISTRIES="own-registry.sample.com:admin:password" \
-  -e CACHE_MAX_SIZE="1G" \
-  -e ALLOW_PUSH="true" \
-  -e ENABLE_MANIFEST_CACHE="true" \
-  openresty-docker-registry-proxy:1.0.0
+  --env-file .env \
+  ${TAG}
+```
+
+# Run with docker compose
+```bash
+TAG="docker-registry-proxy-cache" docker compose up
 ```
 
 The `HTPASSWD` environment variable activates basic authentication. In this example, we define two users:

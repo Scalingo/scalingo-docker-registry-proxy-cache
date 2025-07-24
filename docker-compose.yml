@@ -1,0 +1,10 @@
+services:
+  docker-proxy-cache:
+    image: ${TAG}
+    ports:
+      - 3128
+    volumes:
+      - ./docker_mirror_cache:/docker_mirror_cache
+      - ./certs:/certs
+    env_file:
+      - .env

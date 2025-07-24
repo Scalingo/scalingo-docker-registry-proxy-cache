@@ -1,4 +1,4 @@
-ARG BASE_IMAGE="openresty-proxy-connect:1.0.0"
+ARG BASE_IMAGE="openresty-proxy-connect"
 
 FROM ${BASE_IMAGE}
 

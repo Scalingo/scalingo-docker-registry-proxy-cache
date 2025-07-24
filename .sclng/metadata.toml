@@ -1,0 +1,8 @@
+dependencies = []
+description = "It's a Docker registry cache."
+destination_server = ["internal"]
+flags = ["deployed-by-chef"]
+languages = ["dockerfile", "lua", "shell"]
+owner = "mickael.garrido@scalingo.com"
+team = "SRE"
+version = "1.1.2"
