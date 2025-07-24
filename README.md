@@ -17,7 +17,7 @@ docker run --name openresty_docker_registry_proxy \
   -v $(pwd)/docker_mirror_cache:/docker_mirror_cache \
   -v $(pwd)/certs:/certs \
   --env-file .env \
-  ${TAG}
+  docker-registry-proxy-cache:latest"
 ```
 
 # Run with docker compose
