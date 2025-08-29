@@ -143,6 +143,9 @@ echo -e "\nManifest caching config: ---\n"
 cat /opt/openresty/nginx/conf/nginx.manifest.caching.config.conf
 echo "---"
 
+# Upstreams configuration. We generate config based on the environment vars.
+echo -n "" >/opt/openresty/nginx/conf/upstreams.conf
+
 if [[ "a${ALLOW_PUSH}" == "atrue" ]]; then
   cat <<EOF >/opt/openresty/nginx/conf/allowed.methods.conf
     # allow to upload big layers
@@ -164,6 +167,37 @@ else
         return 405  "DELETE method is not allowed";
     }
 EOF
+  if [ "$UPSTREAM_REGISTRIES" ]; then
+    UPSTREAM_REGISTRIES_DELIMITER=${UPSTREAM_REGISTRIES_DELIMITER:-" "}
+    s=$UPSTREAM_REGISTRIES$UPSTREAM_REGISTRIES_DELIMITER
+    upstream_array=()
+    while [[ $s ]]; do
+      upstream_array+=("${s%%"$UPSTREAM_REGISTRIES_DELIMITER"*}")
+      s=${s#*"$UPSTREAM_REGISTRIES_DELIMITER"}
+    done
+
+    UPSTREAM_REGISTRY_DELIMITER=${UPSTREAM_REGISTRY_DELIMITER:-"|"}
+
+    for ONEREGISTRY in "${upstream_array[@]}"; do
+      s=$ONEREGISTRY$UPSTREAM_REGISTRY_DELIMITER
+      registry_array=()
+      while [[ $s ]]; do
+        registry_array+=("${s%%"$UPSTREAM_REGISTRY_DELIMITER"*}")
+        s=${s#*"$UPSTREAM_REGISTRY_DELIMITER"}
+      done
+      cat <<-EOF >>/opt/openresty/nginx/conf/upstreams.conf
+upstream ${registry_array[0]} {
+$(
+        for i in ${!registry_array[@]}; do
+          if [[ i -gt 0 ]]; then
+            echo "    server ${registry_array[$i]} fail_timeout=5;"
+          fi
+        done
+      )
+}
+EOF
+    done
+  fi
 fi
 
 # Only configure htpasswd if the env var exists
