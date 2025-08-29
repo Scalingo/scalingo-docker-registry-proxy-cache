@@ -11,8 +11,12 @@ ADD nginx.manifest.stale.conf /opt/openresty/nginx/conf/nginx.manifest.stale.con
 ADD proxy_auth.lua /opt/openresty/nginx/conf/proxy_auth.lua
 
 RUN apk add --no-cache --update bash openssl \
-  && mkdir -p /docker_mirror_cache /certs \
-  && chmod +x /generate-certificate.sh /entrypoint.sh
+  && mkdir -p /docker_mirror_cache /certs /opt/openresty/nginx/tmp \
+  && bash -c 'mkdir -p /opt/openresty/nginx/tmp/{client_body,proxy,fastcgi,scgi,uwsgi}' \
+  && chmod +x /generate-certificate.sh /entrypoint.sh \
+  && chmod -R g+rwX /opt/openresty/nginx/conf \
+  && chmod g+rwX /certs \
+  && chmod -R g+rwX /opt/openresty/nginx/tmp
 
 VOLUME /docker_mirror_cache
 VOLUME /certs
@@ -74,6 +78,8 @@ ENV PROXY_CONNECT_SEND_TIMEOUT="60s"
 
 # Allow disabling IPV6 resolution, default to false
 ENV DISABLE_IPV6="false"
+
+USER 1001
 
 # Did you want a shell? Sorry, the entrypoint never returns, because it runs nginx itself. Use 'docker exec' if you need to mess around internally.
 ENTRYPOINT ["/entrypoint.sh"]

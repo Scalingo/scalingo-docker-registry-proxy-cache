@@ -47,6 +47,6 @@ STOPSIGNAL SIGQUIT
 
 ENV PATH="$PATH:/opt/openresty/luajit/bin:/opt/openresty/nginx/sbin:/opt/openresty/bin"
 
-EXPOSE 80
+EXPOSE 3128
 
 CMD ["/opt/openresty/bin/openresty", "-g", "daemon off;"]
