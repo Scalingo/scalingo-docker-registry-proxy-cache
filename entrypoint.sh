@@ -167,7 +167,7 @@ else
         return 405  "DELETE method is not allowed";
     }
 EOF
-  if [[ -v UPSTREAM_REGISTRIES ]]; then
+  if [[ "a${UPSTREAM_REGISTRIES}" != "a" ]]; then
     UPSTREAM_REGISTRIES_DELIMITER=${UPSTREAM_REGISTRIES_DELIMITER:-" "}
     s=$UPSTREAM_REGISTRIES$UPSTREAM_REGISTRIES_DELIMITER
     upstream_array=()
