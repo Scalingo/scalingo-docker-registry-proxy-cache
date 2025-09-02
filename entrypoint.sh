@@ -62,7 +62,7 @@ echo -n "" >/opt/openresty/nginx/conf/docker.targetHost.map
 echo -n "" >/opt/openresty/nginx/conf/docker.auth.map
 
 # Only configure auth registries if the env var contains values
-if [ "$AUTH_REGISTRIES" ]; then
+if [[ ${AUTH_REGISTRIES+x} ]]; then
   # Ref: https://stackoverflow.com/a/47633817/219530
   AUTH_REGISTRIES_DELIMITER=${AUTH_REGISTRIES_DELIMITER:-" "}
   s=$AUTH_REGISTRIES$AUTH_REGISTRIES_DELIMITER
@@ -84,9 +84,9 @@ if [ "$AUTH_REGISTRIES" ]; then
     AUTH_HOST="${registry_array[0]}"
     AUTH_USER="${registry_array[1]}"
     AUTH_PASS="${registry_array[2]}"
-    AUTH_BASE64=$(echo -n ${AUTH_USER}:${AUTH_PASS} | base64 -w0 | xargs)
+    AUTH_HASH=$(echo -n ${AUTH_USER}:${AUTH_PASS} | base64 -w0 | xargs)
     echo "Adding Auth for registry '${AUTH_HOST}' with user '${AUTH_USER}'."
-    echo "\"${AUTH_HOST}\" \"${AUTH_BASE64}\";" >>/opt/openresty/nginx/conf/docker.auth.map
+    echo "\'${AUTH_HOST}\' \'${AUTH_HASH}\';" >>/opt/openresty/nginx/conf/docker.auth.map
   done
 fi
 
@@ -167,7 +167,7 @@ else
         return 405  "DELETE method is not allowed";
     }
 EOF
-  if [[ -v UPSTREAM_REGISTRIES ]]; then
+  if [[ ${UPSTREAM_REGISTRIES+x} ]]; then
     UPSTREAM_REGISTRIES_DELIMITER=${UPSTREAM_REGISTRIES_DELIMITER:-" "}
     s=$UPSTREAM_REGISTRIES$UPSTREAM_REGISTRIES_DELIMITER
     upstream_array=()
@@ -201,7 +201,7 @@ EOF
 fi
 
 # Only configure htpasswd if the env var exists
-if [[ -z ${HTPASSWD+set} ]]; then
+if [[ -z ${HTPASSWD+x} ]]; then
   echo "" >/opt/openresty/nginx/conf/htpasswd.conf
 else
   HTPASSWD_DELIMITER=${HTPASSWD_DELIMITER:-" "}
