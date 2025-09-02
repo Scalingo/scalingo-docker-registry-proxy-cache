@@ -48,7 +48,7 @@ echo -n "" >/opt/openresty/nginx/conf/docker.intercept.map
 # Some hosts/registries are always needed, but others can be configured in env var REGISTRIES
 for ONEREGISTRYIN in docker.caching.proxy.internal registry-1.docker.io auth.docker.io ${REGISTRIES}; do
   ONEREGISTRY=$(echo ${ONEREGISTRYIN} | xargs) # Remove whitespace
-  echo "${ONEREGISTRY} 127.0.0.1:443;" >>/opt/openresty/nginx/conf/docker.intercept.map
+  echo "${ONEREGISTRY} 127.0.0.1:8443;" >>/opt/openresty/nginx/conf/docker.intercept.map
 done
 
 # Clean the list and generate certificates.
@@ -90,8 +90,8 @@ if [ "$AUTH_REGISTRIES" ]; then
   done
 fi
 
-# create default config for the caching layer to listen on 443.
-echo "        listen 443 ssl default_server;" >/opt/openresty/nginx/conf/caching.layer.listen
+# create default config for the caching layer to listen on 8443.
+echo "        listen 8443 ssl default_server;" >/opt/openresty/nginx/conf/caching.layer.listen
 
 # Set Docker Registry cache size, by default, 32 GB ('32g')
 CACHE_MAX_SIZE=${CACHE_MAX_SIZE:-32g}
@@ -167,7 +167,7 @@ else
         return 405  "DELETE method is not allowed";
     }
 EOF
-  if [ "$UPSTREAM_REGISTRIES" ]; then
+  if [[ -v UPSTREAM_REGISTRIES ]]; then
     UPSTREAM_REGISTRIES_DELIMITER=${UPSTREAM_REGISTRIES_DELIMITER:-" "}
     s=$UPSTREAM_REGISTRIES$UPSTREAM_REGISTRIES_DELIMITER
     upstream_array=()
