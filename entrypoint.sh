@@ -90,6 +90,16 @@ if [[ ${AUTH_REGISTRIES+x} ]]; then
   done
 fi
 
+# Target scheme interception. Used to force the http scheme of a registry host
+echo -n "" >/opt/openresty/nginx/conf/docker.targetScheme.map
+
+if [[ ${FORCE_HTTP_REGISTRIES+x} ]]; then
+  for ONEREGISTRYIN in ${FORCE_HTTP_REGISTRIES}; do
+    ONEREGISTRY=$(echo ${ONEREGISTRYIN} | xargs) # Remove whitespace
+    echo "${ONEREGISTRY} http;" >>/opt/openresty/nginx/conf/docker.targetScheme.map
+  done
+fi
+
 # create default config for the caching layer to listen on 8443.
 echo "        listen 8443 ssl default_server;" >/opt/openresty/nginx/conf/caching.layer.listen
 
