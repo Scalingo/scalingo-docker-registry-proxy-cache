@@ -79,6 +79,9 @@ ENV PROXY_CONNECT_SEND_TIMEOUT="60s"
 # Allow disabling IPV6 resolution, default to false
 ENV DISABLE_IPV6="false"
 
+# Forbid unknown registries
+ENV ALLOW_UNKNOWN_REGISTRIES="false"
+
 USER 1001
 
 # Did you want a shell? Sorry, the entrypoint never returns, because it runs nginx itself. Use 'docker exec' if you need to mess around internally.

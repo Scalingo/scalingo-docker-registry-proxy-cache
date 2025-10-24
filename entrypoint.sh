@@ -100,8 +100,29 @@ if [[ ${FORCE_HTTP_REGISTRIES+x} ]]; then
   done
 fi
 
-# create default config for the caching layer to listen on 8443.
-echo "        listen 8443 ssl default_server;" >/opt/openresty/nginx/conf/caching.layer.listen
+# Enforce ssl
+echo -n "" > /opt/openresty/nginx/conf/ssl.conf
+if [[ ${SSL_CIPHERS_LIST+x} ]]; then
+  # Most secured
+  echo "ssl_ciphers ${SSL_CIPHERS_LIST};" >> /opt/openresty/nginx/conf/ssl.conf
+fi
+if [[ ${SSL_PROTOCOLS_LIST+x} ]]; then
+  # Most secured
+  echo "ssl_protocols ${SSL_PROTOCOLS_LIST};" >> /opt/openresty/nginx/conf/ssl.conf
+fi
+
+# Forbid unknown registries
+echo -n "" > /opt/openresty/nginx/conf/forbid_unknown_registries.conf
+if [[ "a${ALLOW_UNKNOWN_REGISTRIES}" != "atrue" ]]; then
+  echo 'if ($interceptedHost != "127.0.0.1:8443") {' >> /opt/openresty/nginx/conf/forbid_unknown_registries.conf
+  echo '  return 403 "docker-registry-proxy: remote request not authorized!";' >> /opt/openresty/nginx/conf/forbid_unknown_registries.conf
+  echo '}' >> /opt/openresty/nginx/conf/forbid_unknown_registries.conf
+  #cat >> /opt/openresty/nginx/conf/forbid_unknown_registries.conf <<-"EOF"
+  #if ($interceptedHost != '127.0.0.1:8443') {
+  #  return 403 "docker-registry-proxy: remote request not authorized!";
+  #}
+  #EOF
+fi
 
 # Set Docker Registry cache size, by default, 32 GB ('32g')
 CACHE_MAX_SIZE=${CACHE_MAX_SIZE:-32g}
