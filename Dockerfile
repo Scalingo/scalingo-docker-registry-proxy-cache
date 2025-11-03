@@ -2,13 +2,13 @@ ARG BASE_IMAGE="openresty-proxy-connect"
 
 FROM ${BASE_IMAGE}
 
-ADD generate-certificate.sh /generate-certificate.sh
-ADD entrypoint.sh /entrypoint.sh
+COPY generate-certificate.sh /generate-certificate.sh
+COPY entrypoint.sh /entrypoint.sh
 
-ADD nginx.conf /opt/openresty/nginx/conf/nginx.conf
-ADD nginx.manifest.common.conf /opt/openresty/nginx/conf/nginx.manifest.common.conf
-ADD nginx.manifest.stale.conf /opt/openresty/nginx/conf/nginx.manifest.stale.conf
-ADD proxy_auth.lua /opt/openresty/nginx/conf/proxy_auth.lua
+COPY nginx.conf /opt/openresty/nginx/conf/nginx.conf
+COPY nginx.manifest.common.conf /opt/openresty/nginx/conf/nginx.manifest.common.conf
+COPY nginx.manifest.stale.conf /opt/openresty/nginx/conf/nginx.manifest.stale.conf
+COPY proxy_auth.lua /opt/openresty/nginx/conf/proxy_auth.lua
 
 RUN apk add --no-cache --update bash openssl \
   && mkdir -p /docker_mirror_cache /certs /opt/openresty/nginx/tmp \

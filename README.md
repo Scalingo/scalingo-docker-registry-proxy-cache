@@ -58,3 +58,15 @@ By default, `generate-certificate.sh` generates a self-signed certificate. You c
 ```
 
 The `insecure-registries` setting should be configured if your proxy is using an invalid or self-signed certificate.
+
+## Run a test environment
+
+Vagrant will create a VM and will run 2 scripts:
+
+* vagrant-deploy.sh => Execute the complete deployment process, including package installation, certificate generation, Docker image builds, and container execution.
+* vagrant-tests.sh => Run integration tests
+
+```bash
+vagrant up --provision docker-registry-cache
+vagrant ssh docker-registry-cache
+```
