@@ -1,15 +1,20 @@
-# Build with bake
+# Docker registry proxy
+
+## Build with bake
+
 ```bash
 docker buildx bake --file docker-bake.hcl
 ```
 
-# Create .env file
+## Create .env file
+
 ```bash
 cp .env.sample .env
 vim .env
 ```
 
-# Run with docker
+## Run with docker
+
 ```bash
 docker run --name openresty_docker_registry_proxy \
   --rm -it \
@@ -20,31 +25,48 @@ docker run --name openresty_docker_registry_proxy \
   docker-registry-proxy-cache:latest
 ```
 
-# Run with docker compose
+## Run with docker compose
+
 ```bash
 docker compose up
 ```
 
 The `HTPASSWD` environment variable activates basic authentication. In this example, we define two users:
-* user1:user1
-* user2:user2
+
+* user1:password1
+* user2:password2
 
 The `HTPASSWD_DELIMITER` environment variable can be used to specify a custom delimiter. By default, a `space` is used.
 
 By default, `generate-certificate.sh` generates a self-signed certificate. You can override this by mounting a volume with your own certificates at `/certs`.
+
 * server.crt
 * server.key
+* proxy_server.crt
+* proxy_server.key
 
-# Configure docker to use a proxy
+## Configure docker to use a proxy
+
 ```json
 {
   ...
   "proxies": {
-    "http-proxy": "http://user1:user1@127.0.0.1:3128",
-    "https-proxy": "http://user1:user1@127.0.0.1:3128"
+    "https-proxy": "https://user1:user1@127.0.0.1:3128"
   },
   "insecure-registries" : ["own-registry.sample.com:443"]
 }
 ```
 
 The `insecure-registries` setting should be configured if your proxy is using an invalid or self-signed certificate.
+
+## Run a test environment
+
+Vagrant will create a VM and will run 2 scripts:
+
+* vagrant-deploy.sh => Execute the complete deployment process, including package installation, certificate generation, Docker image builds, and container execution.
+* vagrant-tests.sh => Run integration tests
+
+```bash
+vagrant up --provision docker-registry-cache
+vagrant ssh docker-registry-cache
+```
